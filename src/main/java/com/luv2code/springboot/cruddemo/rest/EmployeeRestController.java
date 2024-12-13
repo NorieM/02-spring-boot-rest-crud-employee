@@ -9,11 +9,12 @@ import com.luv2code.springboot.cruddemo.entity.Employee;
 import com.luv2code.springboot.cruddemo.service.EmployeeService;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-
+import org.springframework.web.bind.annotation.PutMapping;
 
 @RestController
 @RequestMapping("/api")
@@ -34,7 +35,7 @@ public class EmployeeRestController {
         return employees;
     }
 
-    // add "/employees{employeeId}" endpoint to return individual employee
+    // add "/employees/{employeeId}" endpoint to return individual employee by ID
     @GetMapping("/employees/{employeeId}")
     public Employee getEmployee(@PathVariable int employeeId) {
         Employee theEmployee = employeeService.findById(employeeId);
@@ -58,8 +59,30 @@ public class EmployeeRestController {
 
         return dbEmployee;
 
-        
     }
-    
+
+    // add mapping for PUT /employees - update existing employee
+    @PutMapping("/employees")
+    public Employee updateEmployee(@RequestBody Employee theEmployee) {
+        Employee dbEmployee = employeeService.save(theEmployee);
+        return dbEmployee;
+    }
+
+    // add mapping for DELETE /employees/{id} - delete existing employee by ID
+    @DeleteMapping("/employees/{employeeId}")
+    public String deleteEmployee(@PathVariable int employeeId) {
+
+        Employee tempEmployee = employeeService.findById(employeeId);
+
+        // check if employee found
+        if (tempEmployee == null) {
+            throw new RuntimeException("Employee id not found " + employeeId);
+        }
+
+        employeeService.deleteById(employeeId);
+
+        return "Employee with ID " + employeeId + " deleted!";
+
+    }
 
 }
